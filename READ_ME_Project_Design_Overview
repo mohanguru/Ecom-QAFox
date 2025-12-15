@@ -1,0 +1,120 @@
+Step 1: Create Maven Project
+		1. Create Simple project
+		2. Group ID, Artifact ID is project name
+
+Step 2: POM.xml
+		1. Add dependency under dependencies --> 
+		<dependencies>
+			<dependency>
+				1. Selenium Java -----> https://mvnrepository.com/artifact/org.seleniumhq.selenium/selenium-java
+				2. apache poi --------> https://mvnrepository.com/artifact/org.apache.poi/poi
+				3. apache poi-ooxml --> https://mvnrepository.com/artifact/org.apache.poi/poi-ooxml
+				4. testng ------------> https://mvnrepository.com/artifact/org.testng/testng
+				5. extent report -----> https://mvnrepository.com/artifact/com.aventstack/extentreports
+				6. commons-io --------> https://mvnrepository.com/artifact/commons-io/commons-io
+				7. commons-lang3 -----> https://mvnrepository.com/artifact/org.apache.commons/commons-lang3
+				8. log4j-core --------> https://mvnrepository.com/artifact/org.apache.logging.log4j/log4j-core
+				9. log4j-api ---------> https://mvnrepository.com/artifact/org.apache.logging.log4j/log4j-api
+			</dependency>
+		</dependencies>
+
+3. As a regular practice for testers use --> src/test/java and src/test/resource
+
+src/test/java ---> page object class, test class, utilities, base class
+src/test/resource -> upload data, properties file, input data file
+
+4. Create/ design project
+		src/test/java :
+						1. Page object folder
+						2. test base folder
+						3. test case folder
+						4. utility folder
+						
+		Under main project create folder for:
+					1. logs
+					2. reports
+					3. screenshots
+					4. test data
+
+5. classed under each folders in src/test/java
+		1. Page object folder
+				1. page object class - page object class will always contain constructor, locator, action methods
+									   page object class should not contain any validation. if validation requires capture value and return to test class to validate
+				2. In page object folder only we have to create 
+									-  create one common class to initialize driver. 
+											- create constructor and initialize driver
+											- To initialize driver use PageFactory.initclass(driver,this)
+									- create class for individual app page and extends common class to get browser
+									- create constructor to get driver use super(driver) to get driver from common webdriver.
+									- app page wise xpaths and methods to call and use in methods with @FindBy(xpath="")WebElement variable_Name
+		2. Test Case folder
+				1. create test case for each app page
+				2. using testNG @BeforeTest , @Test, @AfterTest
+				3. initialize browser and pass in page object class
+				3. create common methods and move @BeforeTest and @AfterTest to use common across all test case class
+				
+6. Log4j
+Log4j used for recording all the events in the form of text
+logging level - All < Trace < Debug < Info < Warn < Error < Fatal < Off
+the level covers the downstreams. Eg : Debug covers all the downstream like - Info,Warn,error,fatal,off
+
+		1. Check in POM the following dependencies are added
+				1. /org.apache.logging.log4j/log4j-core - (Mandatory)
+				2. /org.apache.logging.log4j/log4j-api - (Mandatory)
+				3. /org.apache.logging.log4j/log4j-slf4j-impl - (optional but it will manage slf4j error)
+		
+		2. Go to mvnrepository and check the latest version of centralized dependencies are added else update it in POM
+		3. log4j requires log4j2.xml get it from official site and its a template once get it from apache site we have to based on our project requirements
+		4. official site for template - https://logging.apache.org/log4j/2.3.x/manual/configuration.html (under additivity)
+		** I took from the learning module
+		
+In log4j2.xml file
+	There are 2 important things in log4j2.xml file
+		1. Appenders - where to generate logs (Console/File)
+		2. Loggers - what type of logs to generate (All < Trace < Debug < Info < Warn < Error < Fatal < Info)
+
+log4j2.xml file explain : 
+<Configuration status="INFO">
+    <Properties>
+        <Property name="log-path">./logs</Property>  ---------> Properties to choose where to save logs file
+        <Property name="log-pattern">%d{yyyy-MM-dd HH:mm:ss} %-5p %c{1}:%L - %m%n</Property>
+    </Properties>
+    
+<Appenders>
+        <Console name="Console" target="SYSTEM_OUT">  ---> Appender properties for Console
+            <PatternLayout pattern="${log-pattern}"/>
+        </Console>
+
+        <RollingFile name="File" fileName="${log-path}/automation.log" ----> Appenders properties for File
+                     filePattern="${log-path}/automation-%d{MM-dd-yyyy}-%i.log.gz">
+            <PatternLayout pattern="${log-pattern}"/>
+            <Policies>
+                <TimeBasedTriggeringPolicy/>
+                <SizeBasedTriggeringPolicy size="1MB"/>
+            </Policies>
+            <DefaultRolloverStrategy max="10"/>
+        </RollingFile>
+    </Appenders>
+
+    <Loggers>
+        <Root level="INFO">  ----> Loggers level properties
+            <!--<AppenderRef ref="Console"/>-->
+            <AppenderRef ref="File"/> ----> Loggers properties to choose in which form by appenders (console/file)
+        </Root>
+    </Loggers>	
+</Configuration>
+
+Log4j2 .xml and pom file is configured, then go to base/common method - beforeTest
+			1. In common methods, initialize logger like how we do for driver
+				outside the BeforeTest--> public Logger logger; - import org.apache.logging.log4j.Logger;
+				
+				In BeforeTest --> logger=LogManager.getLogger(this.getClass()); - import org.apache.logging.log4j.LogManager;
+						LogManager is pre-define method in logger
+						this will always point the current class which running
+						.getClass() is used to capture class whichever running dynamically
+			
+			2. Once initialized in common method, that common will extend to any @Test methods on different class
+				now just use ---> 	logger.info("<Give info message to be in console/File>")
+									logger.All/Trace/Debug/Info/Warn/Error/Fatal/Off
+
+ 

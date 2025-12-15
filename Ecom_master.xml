@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE suite SYSTEM "https://testng.org/testng-1.0.dtd">
+<suite name="Ecom_Master_Suite">
+	<listeners>
+		<listener class-name="ecom.utilities.Ecom_ExtentReportManager"></listener>
+	</listeners>
+	<test name="Ecom_Tests_Suite">
+	<parameter name="os" value="Windows"/>
+	<parameter name="browser" value="Chrome"></parameter>
+		<classes>
+			<class name="ecom.testcase.Ecom_TC001_HomePage" />
+			<class name="ecom.testcase.Ecom_TC002_Login_Page" />
+			<class name="ecom.testcase.Ecom_TC003_Login_DDT" />
+		</classes>
+	</test>
+
+</suite>
